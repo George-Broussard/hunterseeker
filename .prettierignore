@@ -4,6 +4,9 @@ dist/
 .worktrees/
 pnpm-lock.yaml
 apps/api/
+# Generated from the API contract; regenerate, never format by hand.
+packages/shared/openapi.json
+packages/shared/src/api.d.ts
 # Pre-existing, hand-formatted docs; not part of the code format check.
 AGENTS.md
 .claude/

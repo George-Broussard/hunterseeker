@@ -8,9 +8,14 @@ Grounding context for AI agents working in this repository. Read this before wri
 
 The monorepo skeleton exists; almost no product code does yet. What's real on disk:
 
-- `apps/web` — Next.js (App Router) with empty `(seeker)` / `(hunter)` route groups. See `apps/web/README.md`.
-- `apps/api` — FastAPI with the domain package layout from §5, async SQLAlchemy, Alembic, and `GET /health`. See `apps/api/README.md`.
-- `packages/shared` — workspace package for generated API types (generation lands with the API interface issue).
+- `apps/web` — Next.js (App Router) with `(seeker)` / `(hunter)` route groups and a typed
+  `openapi-fetch` client in `src/lib/api`.
+- `apps/api` — FastAPI with the domain package layout from §5, async SQLAlchemy, Alembic,
+  `GET /health`, and one stub router per domain under `/api/v1/<domain>` (real response
+  shapes, no business logic yet). Error envelope and cursor pagination conventions are in
+  `apps/api/README.md`.
+- `packages/shared` — generated API types (`openapi.json`, `src/api.d.ts`). Regenerate,
+  never hand-edit; CI fails if they are stale.
 - `docker-compose.yml` — Postgres 16 + pgvector for local dev.
 
 Everything else described below — domain models, matching, the ATS, the surfaces — is the

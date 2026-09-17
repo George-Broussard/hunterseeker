@@ -1,0 +1,56 @@
+# Fails when packages/shared/openapi.json or packages/shared/src/api.d.ts is stale
+# relative to the API code. Regenerate with:
+#   (cd apps/api && uv run python scripts/export_openapi.py)
+#   pnpm --filter @hunterseeker/shared generate
+name: ci-shared
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-shared-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codegen:
+    name: generated API types are up to date
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          working-directory: apps/api
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+
+      - uses: pnpm/action-setup@v4
+        # Version comes from the `packageManager` field in package.json.
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: uv sync --locked
+        working-directory: apps/api
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Export OpenAPI from the API code
+        run: uv run python scripts/export_openapi.py
+        working-directory: apps/api
+
+      - name: Generate TypeScript types
+        run: pnpm --filter @hunterseeker/shared generate
+
+      - name: Fail if the committed files differ
+        run: |
+          if ! git diff --exit-code -- packages/shared/openapi.json packages/shared/src/api.d.ts; then
+            echo "::error::packages/shared is stale. Run the export + generate commands above and commit."
+            exit 1
+          fi
