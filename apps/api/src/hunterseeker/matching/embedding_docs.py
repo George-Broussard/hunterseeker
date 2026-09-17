@@ -80,7 +80,9 @@ def _normalize_set(values: tuple[str, ...]) -> tuple[str, ...]:
     for raw in values:
         text = _normalize_text(raw)
         if text:
-            seen.setdefault(text.casefold(), text)
+            key = text.casefold()
+            # Case-variants collapse to one spelling chosen independently of input order.
+            seen[key] = min(seen.get(key, text), text)
     return tuple(seen[key] for key in sorted(seen))
 
 
