@@ -1,0 +1,2254 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "hunter/seeker API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "ops"
+        ],
+        "summary": "Health",
+        "operationId": "ops_health",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Ops Health"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/me": {
+      "get": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "The calling Seeker's Profile",
+        "operationId": "profiles_get_my_profile",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Profile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Update the calling Seeker's Profile",
+        "description": "Partial update. Any change here must trigger re-embedding and re-matching.",
+        "operationId": "profiles_update_my_profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Profile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/matching/job-board": {
+      "get": {
+        "tags": [
+          "matching"
+        ],
+        "summary": "The calling Seeker's Job Board",
+        "description": "Matches for the calling Seeker at or above their match threshold, best first.",
+        "operationId": "matching_list_job_board",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_MatchedJob_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/matching/matches/{match_id}": {
+      "get": {
+        "tags": [
+          "matching"
+        ],
+        "summary": "One Match, Seeker view",
+        "operationId": "matching_get_match",
+        "parameters": [
+          {
+            "name": "match_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Match Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchedJob"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/matching/jobs/{job_id}/candidates": {
+      "get": {
+        "tags": [
+          "matching"
+        ],
+        "summary": "Ranked candidates for a Job",
+        "description": "Every Seeker whose Profile passed this Job's ATS screening, best Match first.",
+        "operationId": "matching_list_candidates",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_MatchedCandidate_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/applications": {
+      "get": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "The calling Seeker's Applications",
+        "description": "The Seeker's application dashboard: every Application with its current status.",
+        "operationId": "applications_list_applications",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_Application_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ats/templates": {
+      "get": {
+        "tags": [
+          "ats"
+        ],
+        "summary": "The calling Hunter's ATS templates",
+        "operationId": "ats_list_templates",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_AtsTemplate_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/messaging/conversations": {
+      "get": {
+        "tags": [
+          "messaging"
+        ],
+        "summary": "The caller's conversations, most recent first",
+        "operationId": "messaging_list_conversations",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_Conversation_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/feed": {
+      "get": {
+        "tags": [
+          "feed"
+        ],
+        "summary": "The calling Seeker's Feed",
+        "description": "Posts from the Seeker's Connections interleaved with new Matches, newest first.\n\nMatches respect the Seeker's match threshold, as on every seeker-facing surface.",
+        "operationId": "feed_list_feed",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_FeedItem_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/network/connections": {
+      "get": {
+        "tags": [
+          "network"
+        ],
+        "summary": "The caller's Connections",
+        "operationId": "network_list_connections",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_Connection_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/imports/runs": {
+      "get": {
+        "tags": [
+          "imports"
+        ],
+        "summary": "Import runs for the calling Hunter's Company Profiles",
+        "operationId": "imports_list_import_runs",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ImportRun_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Application": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "job": {
+            "$ref": "#/components/schemas/JobSummary"
+          },
+          "match_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Match Id",
+            "description": "The Match this Application came through. Applications exist only via a Match."
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "current_stage": {
+            "type": "string",
+            "title": "Current Stage",
+            "description": "Name of the ATS stage the Application is in."
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Submitted At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "job",
+          "match_id",
+          "status",
+          "current_stage",
+          "submitted_at",
+          "updated_at"
+        ],
+        "title": "Application"
+      },
+      "ApplicationStatus": {
+        "type": "string",
+        "enum": [
+          "submitted",
+          "in_review",
+          "interviewing",
+          "offered",
+          "hired",
+          "rejected",
+          "withdrawn"
+        ]
+      },
+      "AtsStage": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ScreeningStage"
+          },
+          {
+            "$ref": "#/components/schemas/HumanStage"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "human": "#/components/schemas/HumanStage",
+            "screening": "#/components/schemas/ScreeningStage"
+          }
+        }
+      },
+      "AtsTemplate": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "hunter_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Hunter Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/AtsStage"
+            },
+            "type": "array",
+            "title": "Stages",
+            "description": "In pipeline order. Screening stages come first."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "hunter_id",
+          "name",
+          "stages",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "AtsTemplate"
+      },
+      "Connection": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserSummary",
+            "description": "The other party, from the caller's point of view."
+          },
+          "status": {
+            "$ref": "#/components/schemas/ConnectionStatus"
+          },
+          "connected_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connected At",
+            "description": "Null until accepted."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user",
+          "status"
+        ],
+        "title": "Connection"
+      },
+      "ConnectionStatus": {
+        "type": "string",
+        "enum": [
+          "pending_sent",
+          "pending_received",
+          "connected"
+        ]
+      },
+      "Conversation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/UserSummary"
+            },
+            "type": "array",
+            "minItems": 2,
+            "title": "Participants"
+          },
+          "last_message": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Message"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unread_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Unread Count",
+            "description": "Unread by the caller."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "participants",
+          "unread_count",
+          "updated_at"
+        ],
+        "title": "Conversation"
+      },
+      "CriterionOperator": {
+        "type": "string",
+        "enum": [
+          "eq",
+          "neq",
+          "gte",
+          "lte",
+          "in",
+          "contains_all",
+          "contains_any"
+        ]
+      },
+      "ErrorBody": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "Stable, machine-readable identifier, e.g. `not_found`."
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Human-readable explanation. Not stable; do not parse."
+          },
+          "details": {
+            "$ref": "#/components/schemas/JsonValue",
+            "description": "Free-form context, or null."
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorBody",
+        "description": "The ``error`` object inside the envelope."
+      },
+      "ErrorEnvelope": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "ErrorEnvelope",
+        "description": "Body of every error response."
+      },
+      "FeedItem": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Post"
+          },
+          {
+            "$ref": "#/components/schemas/MatchedJobItem"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind",
+          "mapping": {
+            "matched_job": "#/components/schemas/MatchedJobItem",
+            "post": "#/components/schemas/Post"
+          }
+        }
+      },
+      "HumanStage": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "human",
+            "title": "Kind",
+            "default": "human"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "HumanStage"
+      },
+      "ImportRun": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "company_profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Company Profile Id"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ImportSource"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ImportRunStatus"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "jobs_seen": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Jobs Seen",
+            "default": 0
+          },
+          "jobs_created": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Jobs Created",
+            "default": 0
+          },
+          "jobs_updated": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Jobs Updated",
+            "default": 0
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Set when `status` is `failed`."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_profile_id",
+          "source",
+          "status"
+        ],
+        "title": "ImportRun",
+        "description": "One execution of an import. Idempotent per external job id; re-runs never duplicate."
+      },
+      "ImportRunStatus": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "running",
+          "succeeded",
+          "failed"
+        ]
+      },
+      "ImportSource": {
+        "type": "string",
+        "enum": [
+          "ashby",
+          "greenhouse"
+        ]
+      },
+      "JobSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "company_profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Company Profile Id"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "remote": {
+            "type": "boolean",
+            "title": "Remote",
+            "default": false
+          },
+          "compensation_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compensation Min",
+            "description": "Annual, in `currency`."
+          },
+          "compensation_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compensation Max",
+            "description": "Annual, in `currency`."
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "description": "ISO 4217 code.",
+            "default": "USD"
+          },
+          "seniority": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seniority"
+          },
+          "posted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Posted At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "company_profile_id",
+          "company_name",
+          "posted_at"
+        ],
+        "title": "JobSummary",
+        "description": "A Job as referenced from a Match, an Application, or the Feed."
+      },
+      "JsonValue": {
+        "anyOf": [
+          {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          {
+            "items": {},
+            "type": "array"
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "MatchedCandidate": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "score": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "description": "Normalized 0-1 Match score."
+          },
+          "ats_pass": {
+            "type": "boolean",
+            "const": true,
+            "title": "Ats Pass",
+            "description": "Always `true`: a Match exists only if the Seeker's Profile has already passed the Job's ATS screening. Present so the invariant is visible in the contract.",
+            "default": true
+          },
+          "computed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Computed At",
+            "description": "When `score` was last (re)computed."
+          },
+          "seeker": {
+            "$ref": "#/components/schemas/UserSummary"
+          },
+          "headline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Headline",
+            "description": "The Seeker's Profile headline. Readable only through this Match."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "score",
+          "computed_at",
+          "seeker"
+        ],
+        "title": "MatchedCandidate",
+        "description": "Hunter-side view of the same Match: the Seeker it surfaces."
+      },
+      "MatchedJob": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "score": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "description": "Normalized 0-1 Match score."
+          },
+          "ats_pass": {
+            "type": "boolean",
+            "const": true,
+            "title": "Ats Pass",
+            "description": "Always `true`: a Match exists only if the Seeker's Profile has already passed the Job's ATS screening. Present so the invariant is visible in the contract.",
+            "default": true
+          },
+          "computed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Computed At",
+            "description": "When `score` was last (re)computed."
+          },
+          "job": {
+            "$ref": "#/components/schemas/JobSummary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "score",
+          "computed_at",
+          "job"
+        ],
+        "title": "MatchedJob",
+        "description": "Seeker-side view of a Match: the Job it recommends."
+      },
+      "MatchedJobItem": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "matched_job",
+            "title": "Kind",
+            "default": "matched_job"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id",
+            "description": "Feed item id, distinct from `match.id`."
+          },
+          "match": {
+            "$ref": "#/components/schemas/MatchedJob"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "When the Match entered the Feed."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "match",
+          "created_at"
+        ],
+        "title": "MatchedJobItem"
+      },
+      "Message": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "conversation_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Conversation Id"
+          },
+          "sender": {
+            "$ref": "#/components/schemas/UserSummary"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 10000,
+            "title": "Body"
+          },
+          "sent_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Sent At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "conversation_id",
+          "sender",
+          "body",
+          "sent_at"
+        ],
+        "title": "Message"
+      },
+      "Page_Application_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Application"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[Application]"
+      },
+      "Page_AtsTemplate_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AtsTemplate"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[AtsTemplate]"
+      },
+      "Page_Connection_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Connection"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[Connection]"
+      },
+      "Page_Conversation_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Conversation"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[Conversation]"
+      },
+      "Page_FeedItem_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FeedItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[FeedItem]"
+      },
+      "Page_ImportRun_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ImportRun"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[ImportRun]"
+      },
+      "Page_MatchedCandidate_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatchedCandidate"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[MatchedCandidate]"
+      },
+      "Page_MatchedJob_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatchedJob"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[MatchedJob]"
+      },
+      "Persona": {
+        "type": "string",
+        "enum": [
+          "seeker",
+          "hunter"
+        ]
+      },
+      "Post": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "post",
+            "title": "Kind",
+            "default": "post"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserSummary"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 5000,
+            "title": "Body"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "author",
+          "body",
+          "created_at"
+        ],
+        "title": "Post"
+      },
+      "Profile": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "seeker_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Seeker Id"
+          },
+          "headline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Headline"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Skills"
+          },
+          "locations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Locations",
+            "description": "Metro areas the Seeker will work in."
+          },
+          "remote_ok": {
+            "type": "boolean",
+            "title": "Remote Ok",
+            "default": true
+          },
+          "work_authorization": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkAuthorization"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compensation_floor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compensation Floor",
+            "description": "Annual, in `currency`. A hard constraint, not a score input."
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "description": "ISO 4217 code.",
+            "default": "USD"
+          },
+          "seniority": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Seniority"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "match_threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Match Threshold",
+            "description": "Seeker-controlled floor. Matches below it are not surfaced.",
+            "default": 0.5
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "seeker_id",
+          "updated_at"
+        ],
+        "title": "Profile"
+      },
+      "ProfileUpdate": {
+        "properties": {
+          "headline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Headline"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "skills": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skills"
+          },
+          "locations": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locations"
+          },
+          "remote_ok": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remote Ok"
+          },
+          "work_authorization": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkAuthorization"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compensation_floor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Compensation Floor"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "seniority": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Seniority"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "match_threshold": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Threshold"
+          }
+        },
+        "type": "object",
+        "title": "ProfileUpdate",
+        "description": "PATCH body: every field optional; omitted fields are left unchanged."
+      },
+      "ScreeningCriterion": {
+        "properties": {
+          "field": {
+            "type": "string",
+            "title": "Field",
+            "description": "Profile field the check reads, e.g. `work_authorization`, `skills`."
+          },
+          "operator": {
+            "$ref": "#/components/schemas/CriterionOperator"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field",
+          "operator",
+          "value"
+        ],
+        "title": "ScreeningCriterion",
+        "description": "One machine-evaluable check against a Profile field."
+      },
+      "ScreeningStage": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "screening",
+            "title": "Kind",
+            "default": "screening"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/ScreeningCriterion"
+            },
+            "type": "array",
+            "title": "Criteria",
+            "description": "All must pass. Evaluated by the engine before any Match exists."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "criteria"
+        ],
+        "title": "ScreeningStage"
+      },
+      "Seniority": {
+        "type": "string",
+        "enum": [
+          "intern",
+          "junior",
+          "mid",
+          "senior",
+          "staff",
+          "principal",
+          "executive"
+        ]
+      },
+      "UserSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "persona": {
+            "$ref": "#/components/schemas/Persona"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name",
+            "description": "What other users see. Never a legal name."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "persona",
+          "display_name"
+        ],
+        "title": "UserSummary",
+        "description": "The minimal public view of a user, embedded wherever a user is referenced."
+      },
+      "WorkAuthorization": {
+        "type": "string",
+        "enum": [
+          "citizen",
+          "permanent_resident",
+          "visa",
+          "needs_sponsorship"
+        ]
+      }
+    }
+  }
+}

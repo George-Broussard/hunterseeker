@@ -41,7 +41,7 @@ addopts = "-q"
 [tool.ruff]
 target-version = "py314"
 line-length = 100
-src = ["src", "alembic"]
+src = ["src", "alembic", "scripts"]
 
 [tool.ruff.lint]
 select = [
@@ -62,7 +62,7 @@ known-first-party = ["hunterseeker"]
 [tool.mypy]
 python_version = "3.14"
 strict = true
-files = ["src", "alembic"]
+files = ["src", "alembic", "scripts"]
 plugins = ["pydantic.mypy"]
 warn_unreachable = true
 
