@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+  - packages/*
+
+# pnpm blocks dependency lifecycle scripts unless listed here. Nothing we use needs
+# its postinstall to run (Next.js ships prebuilt SWC binaries; sharp is optional).
+allowBuilds:
+  sharp: false
+  unrs-resolver: false

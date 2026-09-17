@@ -1,0 +1,9 @@
+node_modules/
+.next/
+dist/
+.worktrees/
+pnpm-lock.yaml
+apps/api/
+# Pre-existing, hand-formatted docs; not part of the code format check.
+AGENTS.md
+.claude/
