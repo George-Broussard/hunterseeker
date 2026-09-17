@@ -1,0 +1,40 @@
+# Node-side CI: apps/web and packages/shared.
+# Python CI for apps/api lives in its own workflow (see the API scaffold issue).
+name: ci-web
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-web-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint / typecheck / test / build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        # Version comes from the `packageManager` field in package.json.
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - run: pnpm format:check
