@@ -1,0 +1,30 @@
+name: Decision
+description: An open question that must be resolved before work can build on it (see AGENTS.md §11).
+labels: ["type:decision", "status:ready"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: The decision to be made, stated precisely.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options
+      description: Each option with its trade-offs. Mark a recommendation if you have one.
+    validations:
+      required: true
+  - type: textarea
+    id: blocks
+    attributes:
+      label: What this blocks
+      description: Issues that can't proceed until this is decided.
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      value: |
+        - [ ] Decision recorded in AGENTS.md
+        - [ ] Question removed from AGENTS.md §11

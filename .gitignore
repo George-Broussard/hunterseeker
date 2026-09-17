@@ -1,0 +1,28 @@
+# Agent worktrees — one per issue, never committed
+.worktrees/
+
+# Dependencies
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# Build output
+.next/
+dist/
+build/
+*.egg-info/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local Claude Code settings (personal overrides; the shared settings.json is committed)
+.claude/settings.local.json

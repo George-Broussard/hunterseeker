@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git *)",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-main.py\"",
+            "timeout": 10,
+            "statusMessage": "Checking git command against main-branch policy"
+          }
+        ]
+      }
+    ]
+  }
+}
