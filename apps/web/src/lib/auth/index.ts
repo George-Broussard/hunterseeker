@@ -53,11 +53,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.sub = user.id;
         token.role = user.role;
       }
+      // A token without our claims (e.g. minted before this schema) is not a usable
+      // session; returning null clears the cookie and the user simply signs in again.
+      if (!token.sub || !isPersona(token.role)) return null;
       return token;
     },
     async session({ session, token }) {
       if (!token.sub || !isPersona(token.role)) {
-        // A token without our claims (e.g. from a previous schema) is not a usable session.
         throw new Error("session token is missing the user id or role claim");
       }
       session.user.id = token.sub;

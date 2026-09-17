@@ -1,6 +1,6 @@
 "use server";
 
-import { AuthError } from "next-auth";
+import { AuthError, CredentialsSignin } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { signIn } from "@/lib/auth";
@@ -23,8 +23,12 @@ export async function loginAction(_prev: FormState, formData: FormData): Promise
   try {
     await signIn("credentials", { email, password, redirect: false });
   } catch (error) {
-    if (error instanceof AuthError) {
+    if (error instanceof CredentialsSignin) {
       return { error: "That email and password don't match.", values };
+    }
+    if (error instanceof AuthError) {
+      // authorize() threw — typically the API is unreachable. Never a credentials problem.
+      return { error: "We couldn't reach the sign-in service. Please try again.", values };
     }
     throw error;
   }

@@ -21,11 +21,12 @@ export async function readFreshSessionRole(): Promise<Persona | null> {
     .getAll()
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");
-  const secure = (process.env.AUTH_URL ?? "").startsWith("https://");
-  const token = await getToken({
-    req: new Request("http://internal", { headers: { cookie: cookieHeader } }),
-    secret: getAuthSecret(),
-    secureCookie: secure,
-  });
-  return isPersona(token?.role) ? token.role : null;
+  const req = new Request("http://internal", { headers: { cookie: cookieHeader } });
+  const secret = getAuthSecret();
+  // Auth.js prefixes the cookie name with __Secure- on https origins; try both.
+  for (const secureCookie of [false, true]) {
+    const token = await getToken({ req, secret, secureCookie });
+    if (isPersona(token?.role)) return token.role;
+  }
+  return null;
 }
