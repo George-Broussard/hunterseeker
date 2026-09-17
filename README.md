@@ -18,6 +18,12 @@ pnpm dev           # Next.js at http://localhost:3000
 ```
 
 Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
+Browser e2e (auth flow): `pnpm --filter @hunterseeker/web test:e2e` — starts its own
+Next dev server and an in-memory auth API; set `E2E_API_URL=http://localhost:8000` to
+run against a real `apps/api`.
+
+Signing in needs `AUTH_SECRET` (and `API_URL`) in the web app's environment and the same
+`AUTH_SECRET` in the API's — see `.env.example`.
 
 The API (`apps/api`) runs separately — see [`apps/api/README.md`](./apps/api/README.md).
 When its contract changes, regenerate the shared types:
