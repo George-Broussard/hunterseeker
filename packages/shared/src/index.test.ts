@@ -34,7 +34,10 @@ describe("@hunterseeker/shared", () => {
   it("has every domain mounted under /api/v1 in the committed openapi.json", () => {
     const paths = Object.keys(spec.paths);
     for (const domain of DOMAINS) {
-      expect(paths.some((p) => p.startsWith(`/api/v1/${domain}`)), domain).toBe(true);
+      expect(
+        paths.some((p) => p.startsWith(`/api/v1/${domain}`)),
+        domain,
+      ).toBe(true);
     }
   });
 });
