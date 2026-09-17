@@ -1,8 +1,8 @@
 """add users table
 
-Revision ID: 9995bc31a364
-Revises: 319842b92cee
-Create Date: 2026-09-17 19:53:49.048329+00:00
+Revision ID: c86a23220b50
+Revises: 9a26f0079407
+Create Date: 2026-09-17 20:06:18.051847+00:00
 
 """
 
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "9995bc31a364"
-down_revision: str | Sequence[str] | None = "319842b92cee"
+revision: str = "c86a23220b50"
+down_revision: str | Sequence[str] | None = "9a26f0079407"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -38,8 +38,8 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
             nullable=False,
         ),
-        sa.PrimaryKeyConstraint("id"),
         sa.CheckConstraint("role IN ('hunter', 'seeker')", name="ck_users_role"),
+        sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
 
