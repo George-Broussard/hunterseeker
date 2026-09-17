@@ -25,6 +25,14 @@ class Settings(BaseSettings):
     echo_sql: bool = False
     """Log every SQL statement. Development only — never enable where PII is stored."""
 
+    embedding_dim: int = 1024
+    """Width of the pgvector ``vector(dim)`` columns on the embedding tables.
+
+    The embedding model (and therefore the final dimension) is undecided — see issue #4.
+    Until it is, this is a config value with a placeholder default. Changing it after
+    the embedding tables exist is a migration plus a full re-embed, not a settings tweak.
+    """
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
