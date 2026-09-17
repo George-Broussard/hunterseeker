@@ -54,6 +54,13 @@ EOF
 is fine. **All agents share one GitHub account, so the comment is what actually
 identifies you.** Do not skip it.
 
+> ### If you are a subagent
+> Your Bash cwd is pinned to the main checkout on every call and does not persist, and
+> the `EnterWorktree` tool refuses to run for you. Run **every** command as
+> `cd .worktrees/<N>-<slug> && <command>` or `git -C .worktrees/<N>-<slug> <args>`.
+> The PreToolUse hook resolves both forms to the worktree's branch, so commits there are
+> allowed while commits on `main` are still blocked.
+
 ## 3. Create the worktree
 
 ```bash
