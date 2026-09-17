@@ -4,12 +4,19 @@ Grounding context for AI agents working in this repository. Read this before wri
 
 ---
 
-## 1. Status: greenfield
+## 1. Status: early scaffold
 
-**This repository is currently empty.** Nothing described below as "layout" or
-"domain model" exists on disk yet — it is the agreed target, not the current state.
+The monorepo skeleton exists; almost no product code does yet. What's real on disk:
 
-Do not assume any file, module, table, or endpoint exists. Check before you reference.
+- `apps/web` — Next.js (App Router) with empty `(seeker)` / `(hunter)` route groups. See `apps/web/README.md`.
+- `apps/api` — FastAPI with the domain package layout from §5, async SQLAlchemy, Alembic, and `GET /health`. See `apps/api/README.md`.
+- `packages/shared` — workspace package for generated API types (generation lands with the API interface issue).
+- `docker-compose.yml` — Postgres 16 + pgvector for local dev.
+
+Everything else described below — domain models, matching, the ATS, the surfaces — is the
+agreed target, not the current state. Check `gh issue list` for what's in flight before
+assuming something exists or doesn't.
+
 When you build something described here, build it as described here; when this file and
 the code disagree, the code wins and this file should be updated in the same PR.
 

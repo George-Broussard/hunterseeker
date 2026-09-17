@@ -8,6 +8,13 @@ description: Open a pull request for the current worktree's branch. Rebases on m
 Run from inside the worktree for the issue. This gets your work to `main` the only
 allowed way: through a PR.
 
+> ### If you are a subagent
+> Your Bash cwd is pinned to the main checkout on every call and does not persist, and
+> the `EnterWorktree` tool refuses to run for you. Run **every** command as
+> `cd .worktrees/<N>-<slug> && <command>` or `git -C .worktrees/<N>-<slug> <args>`.
+> The PreToolUse hook resolves both forms to the worktree's branch, so commits there are
+> allowed while commits on `main` are still blocked.
+
 ## 0. Sanity
 
 ```bash
