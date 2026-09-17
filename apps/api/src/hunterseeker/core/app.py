@@ -8,6 +8,7 @@ from fastapi.routing import APIRoute
 
 from hunterseeker.applications.router import router as applications_router
 from hunterseeker.ats.router import router as ats_router
+from hunterseeker.auth.router import router as auth_router
 from hunterseeker.core.db import get_engine
 from hunterseeker.core.errors import ERROR_RESPONSES, install_error_handlers
 from hunterseeker.feed.router import router as feed_router
@@ -60,5 +61,6 @@ def create_app() -> FastAPI:
     api_v1.include_router(network_router)
     api_v1.include_router(imports_router)
     app.include_router(api_v1)
+    app.include_router(auth_router, prefix="/api/v1")
 
     return app
