@@ -19,6 +19,10 @@ pnpm dev           # Next.js at http://localhost:3000
 
 Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 
+The API (`apps/api`) runs separately — see [`apps/api/README.md`](./apps/api/README.md).
+When its contract changes, regenerate the shared types:
+`(cd apps/api && uv run python scripts/export_openapi.py) && pnpm --filter @hunterseeker/shared generate`.
+
 ## Layout
 
 ```
