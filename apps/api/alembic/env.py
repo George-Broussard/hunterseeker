@@ -17,7 +17,9 @@ from hunterseeker.core.db import Base
 from hunterseeker.core.settings import get_settings
 
 # --- Domain model imports (register tables on Base.metadata for autogenerate) ---------
-# import hunterseeker.profiles.models
+# isort: split
+import hunterseeker.matching.models  # noqa: F401
+
 # -------------------------------------------------------------------------------------
 
 config = context.config
