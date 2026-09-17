@@ -19,7 +19,7 @@ from hunterseeker.core.app import create_app
 from hunterseeker.core.db import get_session
 from hunterseeker.core.settings import get_settings
 
-TEST_SECRET = "test-secret-not-for-production"
+TEST_SECRET = "test-secret-not-for-production-at-least-32-bytes"
 
 
 @pytest.fixture(autouse=True)
