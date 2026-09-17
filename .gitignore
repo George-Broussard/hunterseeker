@@ -26,3 +26,8 @@ build/
 
 # Local Claude Code settings (personal overrides; the shared settings.json is committed)
 .claude/settings.local.json
+
+# Python tooling caches (apps/api)
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/

@@ -1,0 +1,71 @@
+[project]
+name = "hunterseeker"
+version = "0.1.0"
+description = "hunter/seeker API — FastAPI service that owns business logic, matching, and the database."
+readme = "README.md"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    # standard-no-fastapi-cloud-cli = fastapi-cli + uvicorn + httpx etc., minus the cloud deploy CLI.
+    "fastapi[standard-no-fastapi-cloud-cli]>=0.141.1",
+    "uvicorn[standard]>=0.53.0",
+    "sqlalchemy[asyncio]>=2.0.54",
+    "asyncpg>=0.31.0",
+    "alembic>=1.20.0",
+    "pgvector>=0.5.0",
+    "pydantic-settings>=2.15.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "httpx>=0.28.1",
+    "ruff>=0.16.8",
+    "mypy>=2.3.1",
+    "asyncpg-stubs>=0.31.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.15,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "hunterseeker"
+
+[tool.pytest.ini_options]
+testpaths = ["src"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-q"
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+src = ["src", "alembic"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "UP",       # pyupgrade
+    "B",        # bugbear
+    "SIM",      # simplify
+    "ASYNC",    # async pitfalls (blocking calls in async code)
+    "N",        # pep8-naming
+    "RUF",      # ruff-specific
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["hunterseeker"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+files = ["src", "alembic"]
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["pgvector.*"]
+ignore_missing_imports = true
