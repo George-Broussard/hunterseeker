@@ -89,6 +89,7 @@ and UI copy. Do not invent synonyms.
 | Relational | **PostgreSQL** | Users, profiles, jobs, applications, ATS configs, connections, messages. Source of truth. |
 | Vectors | **pgvector** in the same Postgres | Embeddings live beside relational data so a match query can filter on salary/location/work-authorization in one statement. Use HNSW indexes. |
 | Analytics / large data | **Apache Iceberg** | Append-only, high-volume, non-transactional data: feed impressions, match-score history, application funnel events, import runs. Never the source of truth for anything a user edits. |
+| Auth | **Auth.js** (NextAuth) in `apps/web`, JWT to FastAPI | Sessions live in the web app; FastAPI validates the signed token on every request and authorizes from it. Persona role (`hunter` / `seeker`) is a token claim. Decided in #3. |
 | Monorepo | `apps/web`, `apps/api`, `packages/shared` | |
 
 **Rules that follow from this:**
@@ -277,7 +278,6 @@ shared memory across agents; if it's stale, every agent starts wrong.
 
 Not yet settled. If your work depends on one, **ask rather than assume**:
 
-- Auth provider and session strategy.
 - Embedding model and vector dimensionality.
 - Whether matching runs on write, on a schedule, or both.
 - Hosting, deployment, and CI.
