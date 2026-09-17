@@ -1,0 +1,88 @@
+name: ci-api
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "docker-compose.yml"
+      - ".github/workflows/ci-api.yml"
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "docker-compose.yml"
+      - ".github/workflows/ci-api.yml"
+
+concurrency:
+  group: ci-api-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: lint, typecheck, test, migrate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: hunterseeker
+          POSTGRES_PASSWORD: hunterseeker
+          POSTGRES_DB: hunterseeker
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hunterseeker -d hunterseeker"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql+asyncpg://hunterseeker:hunterseeker@localhost:5432/hunterseeker
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          working-directory: apps/api
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install Python and dependencies
+        run: uv sync --locked
+
+      - name: Ruff lint
+        run: uv run ruff check
+
+      - name: Ruff format
+        run: uv run ruff format --check
+
+      - name: Mypy
+        run: uv run mypy
+
+      - name: Pytest
+        run: uv run pytest
+
+      - name: Alembic upgrade head
+        run: uv run alembic upgrade head
+
+      - name: Verify pgvector is enabled and schema is in sync
+        run: |
+          uv run python - <<'PY'
+          import asyncio
+          from sqlalchemy import text
+          from hunterseeker.core.db import get_engine
+
+          async def main() -> None:
+              async with get_engine().connect() as conn:
+                  exts = {r[0] for r in await conn.execute(text("SELECT extname FROM pg_extension"))}
+              assert "vector" in exts, f"pgvector not enabled; extensions: {sorted(exts)}"
+              print("pgvector enabled:", sorted(exts))
+
+          asyncio.run(main())
+          PY
+          uv run alembic check
