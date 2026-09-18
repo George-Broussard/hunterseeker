@@ -672,13 +672,86 @@
         }
       }
     },
+    "/api/v1/messaging/conversations/{conversation_id}/messages": {
+      "post": {
+        "tags": [
+          "messaging"
+        ],
+        "summary": "Send a message in a conversation",
+        "operationId": "messaging_send_message",
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/feed": {
       "get": {
         "tags": [
           "feed"
         ],
         "summary": "The calling Seeker's Feed",
-        "description": "Posts from the Seeker's Connections interleaved with new Matches, newest first.\n\nMatches respect the Seeker's match threshold, as on every seeker-facing surface.",
+        "description": "Posts from the Seeker's Connections interleaved with new Matches, newest first.\n\nInterleaving is done here, server-side; clients render one list and never merge two.\nMatches respect the Seeker's match threshold, as on every seeker-facing surface.",
         "operationId": "feed_list_feed",
         "parameters": [
           {
@@ -721,6 +794,68 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Page_FeedItem_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/feed/posts": {
+      "post": {
+        "tags": [
+          "feed"
+        ],
+        "summary": "Publish a post",
+        "description": "Publish a text post to the caller's Connections' Feeds.",
+        "operationId": "feed_create_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
                 }
               }
             }
@@ -1622,6 +1757,22 @@
         ],
         "title": "Message"
       },
+      "MessageCreate": {
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Body"
+          }
+        },
+        "type": "object",
+        "required": [
+          "body"
+        ],
+        "title": "MessageCreate",
+        "description": "Body of ``POST /messaging/conversations/{conversation_id}/messages``."
+      },
       "Page_Application_": {
         "properties": {
           "items": {
@@ -1888,6 +2039,22 @@
           "created_at"
         ],
         "title": "Post"
+      },
+      "PostCreate": {
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Body"
+          }
+        },
+        "type": "object",
+        "required": [
+          "body"
+        ],
+        "title": "PostCreate",
+        "description": "Body of ``POST /feed/posts``. Text only for now; media and mentions come later."
       },
       "Profile": {
         "properties": {

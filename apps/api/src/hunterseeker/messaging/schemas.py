@@ -16,6 +16,12 @@ class Message(BaseModel):
     sent_at: datetime
 
 
+class MessageCreate(BaseModel):
+    """Body of ``POST /messaging/conversations/{conversation_id}/messages``."""
+
+    body: str = Field(min_length=1, max_length=10_000)
+
+
 class Conversation(BaseModel):
     id: UUID
     participants: list[UserSummary] = Field(min_length=2)

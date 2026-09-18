@@ -154,6 +154,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/messaging/conversations/{conversation_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a message in a conversation */
+        post: operations["messaging_send_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/feed": {
         parameters: {
             query?: never;
@@ -165,11 +182,32 @@ export interface paths {
          * The calling Seeker's Feed
          * @description Posts from the Seeker's Connections interleaved with new Matches, newest first.
          *
+         *     Interleaving is done here, server-side; clients render one list and never merge two.
          *     Matches respect the Seeker's match threshold, as on every seeker-facing surface.
          */
         get: operations["feed_list_feed"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feed/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish a post
+         * @description Publish a text post to the caller's Connections' Feeds.
+         */
+        post: operations["feed_create_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -563,6 +601,14 @@ export interface components {
              */
             sent_at: string;
         };
+        /**
+         * MessageCreate
+         * @description Body of ``POST /messaging/conversations/{conversation_id}/messages``.
+         */
+        MessageCreate: {
+            /** Body */
+            body: string;
+        };
         /** Page[Application] */
         Page_Application_: {
             /** Items */
@@ -665,6 +711,14 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * PostCreate
+         * @description Body of ``POST /feed/posts``. Text only for now; media and mentions come later.
+         */
+        PostCreate: {
+            /** Body */
+            body: string;
         };
         /** Profile */
         Profile: {
@@ -1260,6 +1314,59 @@ export interface operations {
             };
         };
     };
+    messaging_send_message: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Message"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Server error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     feed_list_feed: {
         parameters: {
             query?: {
@@ -1281,6 +1388,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Page_FeedItem_"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Server error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    feed_create_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Post"];
                 };
             };
             /** @description Validation error */

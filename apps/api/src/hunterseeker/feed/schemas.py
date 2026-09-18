@@ -22,6 +22,12 @@ class Post(BaseModel):
     created_at: datetime
 
 
+class PostCreate(BaseModel):
+    """Body of ``POST /feed/posts``. Text only for now; media and mentions come later."""
+
+    body: str = Field(min_length=1, max_length=5000)
+
+
 class MatchedJobItem(BaseModel):
     kind: Literal["matched_job"] = "matched_job"
     id: UUID = Field(description="Feed item id, distinct from `match.id`.")
