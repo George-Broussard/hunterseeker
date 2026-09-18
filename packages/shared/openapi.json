@@ -416,6 +416,92 @@
         }
       }
     },
+    "/api/v1/matching/open-roles": {
+      "get": {
+        "tags": [
+          "matching"
+        ],
+        "summary": "The calling Hunter's open roles with Match activity",
+        "description": "Open Jobs on the Company Profiles the caller manages, most recently posted first.\n\nEach role carries its new-Match count, pipeline counts, and the top three ranked\ncandidates. Candidates are Matches, so all of them have passed the Job's ATS screening.",
+        "operationId": "matching_list_open_roles",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_OpenRole_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/applications": {
       "get": {
         "tags": [
@@ -758,6 +844,239 @@
         }
       }
     },
+    "/api/v1/feed/company": {
+      "get": {
+        "tags": [
+          "feed"
+        ],
+        "summary": "The calling Hunter's company feed",
+        "description": "Posts from the Company Profiles the caller manages and from their network, newest first.",
+        "operationId": "feed_list_company_feed",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_Post_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/feed/company/posts": {
+      "post": {
+        "tags": [
+          "feed"
+        ],
+        "summary": "Post to the company feed as a Company Profile",
+        "operationId": "feed_create_company_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyPostCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/feed/company-profiles": {
+      "get": {
+        "tags": [
+          "feed"
+        ],
+        "summary": "Company Profiles the calling Hunter manages",
+        "description": "The Company Profiles the caller may post as.\n\nStopgap until a Company Profile domain exists.",
+        "operationId": "feed_list_company_profiles",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page's `next_cursor`. Omit for the first page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size, 1-100.",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size, 1-100."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_CompanyProfileSummary_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/network/connections": {
       "get": {
         "tags": [
@@ -1052,6 +1371,49 @@
           "updated_at"
         ],
         "title": "AtsTemplate"
+      },
+      "CompanyPostCreate": {
+        "properties": {
+          "company_profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Company Profile Id",
+            "description": "The Company Profile to post as. The caller must manage it."
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 1,
+            "title": "Body"
+          }
+        },
+        "type": "object",
+        "required": [
+          "company_profile_id",
+          "body"
+        ],
+        "title": "CompanyPostCreate",
+        "description": "Body for posting to the company feed as a Company Profile."
+      },
+      "CompanyProfileSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "CompanyProfileSummary",
+        "description": "A Company Profile as referenced from a post.\n\nLives in the feed contract until a Company Profile domain exists; see the follow-up\nissue on Company Profile management."
       },
       "Connection": {
         "properties": {
@@ -1622,6 +1984,40 @@
         ],
         "title": "Message"
       },
+      "OpenRole": {
+        "properties": {
+          "job": {
+            "$ref": "#/components/schemas/JobSummary"
+          },
+          "new_match_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "New Match Count",
+            "description": "Matches created since the calling Hunter last viewed this role."
+          },
+          "pipeline": {
+            "$ref": "#/components/schemas/RolePipelineCounts"
+          },
+          "top_candidates": {
+            "items": {
+              "$ref": "#/components/schemas/MatchedCandidate"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Top Candidates",
+            "description": "Highest-scoring Matches for the Job, best first. At most three."
+          }
+        },
+        "type": "object",
+        "required": [
+          "job",
+          "new_match_count",
+          "pipeline",
+          "top_candidates"
+        ],
+        "title": "OpenRole",
+        "description": "Hunter-side summary of one open Job: its Match activity and pipeline state.\n\nThe Hunter's mirror of the Job Board card. ``top_candidates`` are Matches, so each one\nhas already passed the Job's ATS screening (``ats_pass`` is always ``true``)."
+      },
       "Page_Application_": {
         "properties": {
           "items": {
@@ -1677,6 +2073,34 @@
           "items"
         ],
         "title": "Page[AtsTemplate]"
+      },
+      "Page_CompanyProfileSummary_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyProfileSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[CompanyProfileSummary]"
       },
       "Page_Connection_": {
         "properties": {
@@ -1846,6 +2270,62 @@
         ],
         "title": "Page[MatchedJob]"
       },
+      "Page_OpenRole_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OpenRole"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[OpenRole]"
+      },
+      "Page_Post_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `cursor` to fetch the next page. `null` on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "Page[Post]"
+      },
       "Persona": {
         "type": "string",
         "enum": [
@@ -1868,6 +2348,17 @@
           },
           "author": {
             "$ref": "#/components/schemas/UserSummary"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CompanyProfileSummary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when a Hunter posted *as* a Company Profile they manage; `author` is then that Hunter. Null for a post made as oneself."
           },
           "body": {
             "type": "string",
@@ -2131,6 +2622,36 @@
         "type": "object",
         "title": "ProfileUpdate",
         "description": "PATCH body: every field optional; omitted fields are left unchanged."
+      },
+      "RolePipelineCounts": {
+        "properties": {
+          "screened": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Screened",
+            "description": "Matches for the Job: every Seeker whose Profile passed its ATS screening. This is the whole candidate pool — nobody unscreened is counted anywhere."
+          },
+          "interviewing": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Interviewing",
+            "description": "Applications currently in a human interview stage."
+          },
+          "offer": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Offer",
+            "description": "Applications with an offer extended."
+          }
+        },
+        "type": "object",
+        "required": [
+          "screened",
+          "interviewing",
+          "offer"
+        ],
+        "title": "RolePipelineCounts",
+        "description": "How many Seekers sit at each point of a Job's pipeline, as shown on a role card."
       },
       "ScreeningCriterion": {
         "properties": {

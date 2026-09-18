@@ -100,6 +100,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/matching/open-roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The calling Hunter's open roles with Match activity
+         * @description Open Jobs on the Company Profiles the caller manages, most recently posted first.
+         *
+         *     Each role carries its new-Match count, pipeline counts, and the top three ranked
+         *     candidates. Candidates are Matches, so all of them have passed the Job's ATS screening.
+         */
+        get: operations["matching_list_open_roles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/applications": {
         parameters: {
             query?: never;
@@ -168,6 +191,65 @@ export interface paths {
          *     Matches respect the Seeker's match threshold, as on every seeker-facing surface.
          */
         get: operations["feed_list_feed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feed/company": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The calling Hunter's company feed
+         * @description Posts from the Company Profiles the caller manages and from their network, newest first.
+         */
+        get: operations["feed_list_company_feed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feed/company/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post to the company feed as a Company Profile */
+        post: operations["feed_create_company_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feed/company-profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Company Profiles the calling Hunter manages
+         * @description The Company Profiles the caller may post as.
+         *
+         *     Stopgap until a Company Profile domain exists.
+         */
+        get: operations["feed_list_company_profiles"];
         put?: never;
         post?: never;
         delete?: never;
@@ -277,6 +359,36 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /**
+         * CompanyPostCreate
+         * @description Body for posting to the company feed as a Company Profile.
+         */
+        CompanyPostCreate: {
+            /**
+             * Company Profile Id
+             * Format: uuid
+             * @description The Company Profile to post as. The caller must manage it.
+             */
+            company_profile_id: string;
+            /** Body */
+            body: string;
+        };
+        /**
+         * CompanyProfileSummary
+         * @description A Company Profile as referenced from a post.
+         *
+         *     Lives in the feed contract until a Company Profile domain exists; see the follow-up
+         *     issue on Company Profile management.
+         */
+        CompanyProfileSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
         };
         /** Connection */
         Connection: {
@@ -563,6 +675,27 @@ export interface components {
              */
             sent_at: string;
         };
+        /**
+         * OpenRole
+         * @description Hunter-side summary of one open Job: its Match activity and pipeline state.
+         *
+         *     The Hunter's mirror of the Job Board card. ``top_candidates`` are Matches, so each one
+         *     has already passed the Job's ATS screening (``ats_pass`` is always ``true``).
+         */
+        OpenRole: {
+            job: components["schemas"]["JobSummary"];
+            /**
+             * New Match Count
+             * @description Matches created since the calling Hunter last viewed this role.
+             */
+            new_match_count: number;
+            pipeline: components["schemas"]["RolePipelineCounts"];
+            /**
+             * Top Candidates
+             * @description Highest-scoring Matches for the Job, best first. At most three.
+             */
+            top_candidates: components["schemas"]["MatchedCandidate"][];
+        };
         /** Page[Application] */
         Page_Application_: {
             /** Items */
@@ -577,6 +710,16 @@ export interface components {
         Page_AtsTemplate_: {
             /** Items */
             items: components["schemas"]["AtsTemplate"][];
+            /**
+             * Next Cursor
+             * @description Pass as `cursor` to fetch the next page. `null` on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /** Page[CompanyProfileSummary] */
+        Page_CompanyProfileSummary_: {
+            /** Items */
+            items: components["schemas"]["CompanyProfileSummary"][];
             /**
              * Next Cursor
              * @description Pass as `cursor` to fetch the next page. `null` on the last page.
@@ -643,6 +786,26 @@ export interface components {
              */
             next_cursor?: string | null;
         };
+        /** Page[OpenRole] */
+        Page_OpenRole_: {
+            /** Items */
+            items: components["schemas"]["OpenRole"][];
+            /**
+             * Next Cursor
+             * @description Pass as `cursor` to fetch the next page. `null` on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /** Page[Post] */
+        Page_Post_: {
+            /** Items */
+            items: components["schemas"]["Post"][];
+            /**
+             * Next Cursor
+             * @description Pass as `cursor` to fetch the next page. `null` on the last page.
+             */
+            next_cursor?: string | null;
+        };
         /** @enum {string} */
         Persona: "seeker" | "hunter";
         /** Post */
@@ -658,6 +821,8 @@ export interface components {
              */
             id: string;
             author: components["schemas"]["UserSummary"];
+            /** @description Set when a Hunter posted *as* a Company Profile they manage; `author` is then that Hunter. Null for a post made as oneself. */
+            company?: components["schemas"]["CompanyProfileSummary"] | null;
             /** Body */
             body: string;
             /**
@@ -742,6 +907,27 @@ export interface components {
             seniority?: components["schemas"]["Seniority"] | null;
             /** Match Threshold */
             match_threshold?: number | null;
+        };
+        /**
+         * RolePipelineCounts
+         * @description How many Seekers sit at each point of a Job's pipeline, as shown on a role card.
+         */
+        RolePipelineCounts: {
+            /**
+             * Screened
+             * @description Matches for the Job: every Seeker whose Profile passed its ATS screening. This is the whole candidate pool — nobody unscreened is counted anywhere.
+             */
+            screened: number;
+            /**
+             * Interviewing
+             * @description Applications currently in a human interview stage.
+             */
+            interviewing: number;
+            /**
+             * Offer
+             * @description Applications with an offer extended.
+             */
+            offer: number;
         };
         /**
          * ScreeningCriterion
@@ -1104,6 +1290,58 @@ export interface operations {
             };
         };
     };
+    matching_list_open_roles: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor from a previous page's `next_cursor`. Omit for the first page. */
+                cursor?: string | null;
+                /** @description Page size, 1-100. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_OpenRole_"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Server error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     applications_list_applications: {
         parameters: {
             query?: {
@@ -1281,6 +1519,161 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Page_FeedItem_"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Server error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    feed_list_company_feed: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor from a previous page's `next_cursor`. Omit for the first page. */
+                cursor?: string | null;
+                /** @description Page size, 1-100. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_Post_"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Server error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    feed_create_company_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyPostCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Post"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Server error */
+            "5XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    feed_list_company_profiles: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor from a previous page's `next_cursor`. Omit for the first page. */
+                cursor?: string | null;
+                /** @description Page size, 1-100. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_CompanyProfileSummary_"];
                 };
             };
             /** @description Validation error */

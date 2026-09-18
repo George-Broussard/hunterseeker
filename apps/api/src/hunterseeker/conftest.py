@@ -1,3 +1,5 @@
+"""Shared pytest fixtures: an app instance and an in-process HTTP client for every domain."""
+
 from collections.abc import AsyncIterator
 
 import pytest
