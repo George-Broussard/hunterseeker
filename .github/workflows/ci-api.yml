@@ -42,6 +42,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql+asyncpg://hunterseeker:hunterseeker@localhost:5432/hunterseeker
+      AUTH_SECRET: ci-only-secret-not-for-production
 
     steps:
       - uses: actions/checkout@v7

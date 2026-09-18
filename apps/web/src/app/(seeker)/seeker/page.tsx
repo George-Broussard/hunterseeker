@@ -1,6 +1,7 @@
 import type { ApiSchema } from "@hunterseeker/shared";
 
-import { api, describeApiError } from "@/lib/api";
+import { describeApiError } from "@/lib/api";
+import { authenticatedApi } from "@/lib/auth/api-client";
 
 // The Job Board is per-Seeker and re-ranked continuously: never prerender it.
 export const dynamic = "force-dynamic";
@@ -10,9 +11,9 @@ type MatchedJob = ApiSchema<"MatchedJob">;
 async function loadJobBoard(): Promise<
   { ok: true; matches: MatchedJob[] } | { ok: false; message: string }
 > {
-  // TODO(auth): the client will send the Seeker's token once login lands (#7).
+  // Sends the signed-in Seeker's bearer token; the proxy guarantees a Seeker session here.
   try {
-    const { data, error, response } = await api.GET("/api/v1/matching/job-board", {
+    const { data, error, response } = await authenticatedApi.GET("/api/v1/matching/job-board", {
       params: { query: { limit: 20 } },
     });
     if (!data) {

@@ -33,6 +33,13 @@ class Settings(BaseSettings):
     the embedding tables exist is a migration plus a full re-embed, not a settings tweak.
     """
 
+    auth_secret: str
+    """HMAC secret shared with ``apps/web`` (Auth.js ``AUTH_SECRET``).
+
+    The web app signs the API bearer token with it; ``hunterseeker.auth.deps`` verifies the
+    signature with the same value. Required — there is no safe default.
+    """
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

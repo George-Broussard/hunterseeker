@@ -14,6 +14,7 @@ apps/api/
     main.py                # ASGI entrypoint: `app = create_app()`
     core/                  # settings, db engine/session, app factory, /health,
                            # error envelope (errors.py), cursor pagination (pagination.py)
+    auth/                  # users table, /api/v1/auth/{signup,verify,me}, get_current_user
     matching/ profiles/ applications/ ats/ messaging/ imports/ feed/ network/
       router.py            # endpoints, mounted at /api/v1/<domain>
       schemas.py           # Pydantic models — the API contract for the domain
@@ -149,3 +150,13 @@ directory or at the repo root. See `../../.env.example`.
 |----------------|----------------------------------------------------------------------|
 | `DATABASE_URL` | `postgresql+asyncpg://hunterseeker:hunterseeker@localhost:5432/hunterseeker` |
 | `ECHO_SQL`     | `false`                                                              |
+| `AUTH_SECRET`  | *(required)* — shared with `apps/web`; verifies the bearer token     |
+
+## Authentication
+
+Sessions live in `apps/web` (Auth.js, decided in #3). The web app calls
+`POST /api/v1/auth/signup` and `POST /api/v1/auth/verify` server-side, then sends a
+short-lived HS256 JWT (`sub`, `role`, `email`; signed with `AUTH_SECRET`) as
+`Authorization: Bearer …` on every API request. Endpoints get the caller via
+`hunterseeker.auth.deps.get_current_user` / `require_role("hunter")` — no database
+round-trip, the token is the authority. Ownership checks still belong in each endpoint.

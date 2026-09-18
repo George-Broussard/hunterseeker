@@ -10,3 +10,7 @@ packages/shared/src/api.d.ts
 # Pre-existing, hand-formatted docs; not part of the code format check.
 AGENTS.md
 .claude/
+
+# Playwright output
+apps/web/test-results/
+apps/web/playwright-report/

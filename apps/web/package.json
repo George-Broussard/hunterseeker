@@ -7,16 +7,21 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@hunterseeker/shared": "workspace:*",
+    "jose": "^6.2.12",
     "next": "16.3.5",
+    "next-auth": "5.0.0-beta.32",
     "openapi-fetch": "^0.17.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24",
     "@types/react": "^19",

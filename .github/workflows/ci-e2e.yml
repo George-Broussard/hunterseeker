@@ -1,0 +1,44 @@
+# Browser e2e for apps/web (Playwright). Runs against the in-memory auth API stand-in in
+# apps/web/e2e/mock-api.mjs so it needs no Python or Postgres; the API's own contract is
+# covered by ci-api. Set E2E_API_URL to run the suite against a real apps/api instead.
+name: ci-e2e
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    name: playwright (chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @hunterseeker/web exec playwright install --with-deps chromium
+
+      - run: pnpm --filter @hunterseeker/web test:e2e
+        env:
+          CI: "1"
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-test-results
+          path: apps/web/test-results/
+          retention-days: 7

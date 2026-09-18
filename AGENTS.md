@@ -16,6 +16,11 @@ The monorepo skeleton exists; almost no product code does yet. What's real on di
   `apps/api/README.md`.
 - `packages/shared` — generated API types (`openapi.json`, `src/api.d.ts`). Regenerate,
   never hand-edit; CI fails if they are stale.
+- Auth (#7): `users` table and `/api/v1/auth/{signup,verify,me}` in `apps/api/.../auth/`;
+  Auth.js login/signup in `apps/web/src/app/(auth)/` with the route guard in
+  `apps/web/src/proxy.ts`. Endpoints take the caller from
+  `hunterseeker.auth.deps.get_current_user`; server components from `auth()` in
+  `apps/web/src/lib/auth`.
 - `docker-compose.yml` — Postgres 16 + pgvector for local dev.
 
 Everything else described below — domain models, matching, the ATS, the surfaces — is the
