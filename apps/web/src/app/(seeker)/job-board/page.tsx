@@ -1,6 +1,9 @@
+import Link from "next/link";
+
 import type { ApiSchema } from "@hunterseeker/shared";
 
 import { api, describeApiError } from "@/lib/api";
+import { formatCompensation, formatLocation, formatMatchScore } from "@/lib/format";
 
 // The Job Board is per-Seeker and re-ranked continuously: never prerender it.
 export const dynamic = "force-dynamic";
@@ -24,18 +27,7 @@ async function loadJobBoard(): Promise<
   }
 }
 
-function formatCompensation(job: MatchedJob["job"]): string | null {
-  if (job.compensation_min == null && job.compensation_max == null) return null;
-  const fmt = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: job.currency,
-    maximumFractionDigits: 0,
-  });
-  const lo = job.compensation_min != null ? fmt.format(job.compensation_min) : null;
-  const hi = job.compensation_max != null ? fmt.format(job.compensation_max) : null;
-  return lo && hi ? `${lo} - ${hi}` : (lo ?? hi);
-}
-
+/** The Job Board: Matches only, no posts (AGENTS.md §3). The Feed at `/` is where they mix. */
 export default async function SeekerJobBoardPage() {
   const result = await loadJobBoard();
 
@@ -52,18 +44,25 @@ export default async function SeekerJobBoardPage() {
         <ul className="flex flex-col gap-4">
           {result.matches.map((match) => {
             const compensation = formatCompensation(match.job);
+            const location = formatLocation(match.job);
             return (
               <li key={match.id} className="rounded-lg border border-current/15 p-4">
                 <div className="flex items-baseline justify-between gap-4">
-                  <h2 className="font-medium">{match.job.title}</h2>
+                  <h2 className="font-medium">
+                    <Link
+                      href={`/matches/${match.id}`}
+                      className="hover:underline underline-offset-4"
+                    >
+                      {match.job.title}
+                    </Link>
+                  </h2>
                   <span className="text-sm tabular-nums" title="Match score">
-                    {Math.round(match.score * 100)}% match
+                    {formatMatchScore(match.score)} match
                   </span>
                 </div>
                 <p className="text-sm opacity-70">
                   {match.job.company_name}
-                  {match.job.location ? ` · ${match.job.location}` : ""}
-                  {match.job.remote ? " · remote" : ""}
+                  {location ? ` · ${location}` : ""}
                 </p>
                 {compensation ? <p className="text-sm">{compensation}</p> : null}
               </li>
