@@ -52,6 +52,7 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     api_v1 = APIRouter(prefix=API_V1_PREFIX)
+    api_v1.include_router(auth_router)
     api_v1.include_router(profiles_router)
     api_v1.include_router(matching_router)
     api_v1.include_router(applications_router)
@@ -61,6 +62,5 @@ def create_app() -> FastAPI:
     api_v1.include_router(network_router)
     api_v1.include_router(imports_router)
     app.include_router(api_v1)
-    app.include_router(auth_router, prefix="/api/v1")
 
     return app

@@ -23,7 +23,7 @@ test.describe("signup", () => {
     await signUp(page, "seeker", uniqueEmail("seeker"));
 
     await expect(page).toHaveURL(SEEKER_HOME);
-    await expect(page.getByText("Seeker — placeholder")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Job Board" })).toBeVisible();
   });
 
   test("as a Hunter lands on /hunter", async ({ page }) => {
