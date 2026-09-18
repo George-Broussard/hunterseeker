@@ -11,7 +11,8 @@ from collections.abc import AsyncIterator
 
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import text
+from sqlalchemy import Table, inspect, text
+from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from hunterseeker.auth.models import User
@@ -30,12 +31,25 @@ def _auth_secret(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture
 async def db_session() -> AsyncIterator[AsyncSession]:
-    """A session on a throwaway ``users`` table. Skips if Postgres is not reachable."""
+    """A session on the ``users`` table. Skips if Postgres is not reachable.
+
+    If migrations have not been applied yet (CI runs pytest before ``alembic upgrade``),
+    the table is created for the test and dropped afterwards so the migration still
+    applies cleanly. If it already exists, only this run's rows are removed.
+    """
     url = os.environ.get("DATABASE_URL", get_settings().database_url)
     engine = create_async_engine(url, poolclass=None)
+    users_table = User.__table__
+    assert isinstance(users_table, Table)
+
+    def _has_users_table(conn: Connection) -> bool:
+        return inspect(conn).has_table(users_table.name)
+
     try:
         async with engine.begin() as conn:
-            await conn.run_sync(User.__table__.create, checkfirst=True)  # type: ignore[attr-defined]
+            created_here = not await conn.run_sync(_has_users_table)
+            if created_here:
+                await conn.run_sync(users_table.create)
     except OSError as exc:  # connection refused etc.
         await engine.dispose()
         pytest.skip(f"Postgres not reachable at {url!r}: {exc}")
@@ -46,7 +60,12 @@ async def db_session() -> AsyncIterator[AsyncSession]:
             yield session
     finally:
         async with engine.begin() as conn:
-            await conn.execute(text("DELETE FROM users WHERE email LIKE 'pytest-%@example.com'"))
+            if created_here:
+                await conn.run_sync(users_table.drop)
+            else:
+                await conn.execute(
+                    text("DELETE FROM users WHERE email LIKE 'pytest-%@example.com'")
+                )
         await engine.dispose()
 
 
