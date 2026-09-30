@@ -4,8 +4,10 @@ from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
+from hunterseeker.auth.deps import require_role
+from hunterseeker.auth.tokens import CurrentUser
 from hunterseeker.core.pagination import CursorQuery, Page
 from hunterseeker.core.schemas import UserSummary
 from hunterseeker.feed.schemas import FeedItem, MatchedJobItem, Post
@@ -49,11 +51,14 @@ _STUB_ITEMS: list[FeedItem] = [
 
 
 @router.get("", summary="The calling Seeker's Feed")
-async def list_feed(params: Annotated[CursorQuery, Query()]) -> Page[FeedItem]:
+async def list_feed(
+    params: Annotated[CursorQuery, Query()],
+    user: Annotated[CurrentUser, Depends(require_role("seeker"))],
+) -> Page[FeedItem]:
     """Posts from the Seeker's Connections interleaved with new Matches, newest first.
 
     Matches respect the Seeker's match threshold, as on every seeker-facing surface.
     """
-    # TODO(auth): seeker-only; scoped to the caller.
-    del params
+    # TODO(feed): scope to `user`'s Connections + Matches, once persisted.
+    del params, user
     return Page(items=_STUB_ITEMS, next_cursor=None)

@@ -247,6 +247,7 @@
           "profiles"
         ],
         "summary": "The calling Seeker's Profile",
+        "description": "Returns the caller's own Profile. Hunters never read a Profile by ID — only the\nslice exposed through a Match or an Application (AGENTS.md §8).",
         "operationId": "profiles_get_my_profile",
         "responses": {
           "200": {
@@ -289,7 +290,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       },
       "patch": {
         "tags": [
@@ -349,7 +355,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/api/v1/matching/job-board": {
@@ -360,6 +371,11 @@
         "summary": "The calling Seeker's Job Board",
         "description": "Matches for the calling Seeker at or above their match threshold, best first.",
         "operationId": "matching_list_job_board",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "cursor",
@@ -445,6 +461,11 @@
         ],
         "summary": "One Match, Seeker view",
         "operationId": "matching_get_match",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "match_id",
@@ -509,6 +530,11 @@
         "summary": "Ranked candidates for a Job",
         "description": "Every Seeker whose Profile passed this Job's ATS screening, best Match first.",
         "operationId": "matching_list_candidates",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "job_id",
@@ -605,6 +631,11 @@
         "summary": "The calling Seeker's Applications",
         "description": "The Seeker's application dashboard: every Application with its current status.",
         "operationId": "applications_list_applications",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "cursor",
@@ -690,6 +721,11 @@
         ],
         "summary": "The calling Hunter's ATS templates",
         "operationId": "ats_list_templates",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "cursor",
@@ -774,7 +810,13 @@
           "messaging"
         ],
         "summary": "The caller's conversations, most recent first",
+        "description": "Any persona; scoped to conversations the caller participates in.",
         "operationId": "messaging_list_conversations",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "cursor",
@@ -861,6 +903,11 @@
         "summary": "The calling Seeker's Feed",
         "description": "Posts from the Seeker's Connections interleaved with new Matches, newest first.\n\nMatches respect the Seeker's match threshold, as on every seeker-facing surface.",
         "operationId": "feed_list_feed",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "cursor",
@@ -945,7 +992,13 @@
           "network"
         ],
         "summary": "The caller's Connections",
+        "description": "Any persona; same endpoint for Seekers and Hunters.",
         "operationId": "network_list_connections",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "cursor",
@@ -1031,6 +1084,11 @@
         ],
         "summary": "Import runs for the calling Hunter's Company Profiles",
         "operationId": "imports_list_import_runs",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "cursor",

@@ -4,9 +4,11 @@ from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
 from hunterseeker.ats.schemas import AtsTemplate, HumanStage, ScreeningCriterion, ScreeningStage
+from hunterseeker.auth.deps import require_role
+from hunterseeker.auth.tokens import CurrentUser
 from hunterseeker.core.pagination import CursorQuery, Page
 
 router = APIRouter(prefix="/ats", tags=["ats"])
@@ -35,7 +37,10 @@ _STUB_TEMPLATE = AtsTemplate(
 
 
 @router.get("/templates", summary="The calling Hunter's ATS templates")
-async def list_templates(params: Annotated[CursorQuery, Query()]) -> Page[AtsTemplate]:
-    # TODO(auth): hunter-only; scoped to templates the caller owns.
-    del params
+async def list_templates(
+    params: Annotated[CursorQuery, Query()],
+    user: Annotated[CurrentUser, Depends(require_role("hunter"))],
+) -> Page[AtsTemplate]:
+    # TODO(ats): scope to templates `user` owns, once persisted.
+    del params, user
     return Page(items=[_STUB_TEMPLATE], next_cursor=None)

@@ -4,9 +4,11 @@ from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
 from hunterseeker.applications.schemas import Application
+from hunterseeker.auth.deps import require_role
+from hunterseeker.auth.tokens import CurrentUser
 from hunterseeker.core.pagination import CursorQuery, Page
 from hunterseeker.matching.schemas import JobSummary
 
@@ -35,8 +37,11 @@ _STUB_APPLICATION = Application(
 
 
 @router.get("", summary="The calling Seeker's Applications")
-async def list_applications(params: Annotated[CursorQuery, Query()]) -> Page[Application]:
+async def list_applications(
+    params: Annotated[CursorQuery, Query()],
+    user: Annotated[CurrentUser, Depends(require_role("seeker"))],
+) -> Page[Application]:
     """The Seeker's application dashboard: every Application with its current status."""
-    # TODO(auth): seeker-only; scoped to the caller.
-    del params
+    # TODO(applications): scope to `user`'s own Applications, once persisted.
+    del params, user
     return Page(items=[_STUB_APPLICATION], next_cursor=None)

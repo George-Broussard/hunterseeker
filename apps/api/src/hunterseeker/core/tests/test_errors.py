@@ -16,8 +16,12 @@ def _assert_envelope(body: dict[str, object], code: str) -> dict[str, object]:
     return error
 
 
-async def test_api_error_from_domain_code(client: AsyncClient) -> None:
-    response = await client.get("/api/v1/matching/matches/00000000-0000-4000-8000-0000000000ff")
+async def test_api_error_from_domain_code(
+    client: AsyncClient, seeker_headers: dict[str, str]
+) -> None:
+    response = await client.get(
+        "/api/v1/matching/matches/00000000-0000-4000-8000-0000000000ff", headers=seeker_headers
+    )
 
     assert response.status_code == 404
     error = _assert_envelope(response.json(), "not_found")
@@ -38,8 +42,10 @@ async def test_method_not_allowed_uses_envelope(client: AsyncClient) -> None:
     _assert_envelope(response.json(), "method_not_allowed")
 
 
-async def test_validation_error_uses_envelope_with_details(client: AsyncClient) -> None:
-    response = await client.get("/api/v1/feed", params={"limit": 0})
+async def test_validation_error_uses_envelope_with_details(
+    client: AsyncClient, seeker_headers: dict[str, str]
+) -> None:
+    response = await client.get("/api/v1/feed", params={"limit": 0}, headers=seeker_headers)
 
     assert response.status_code == 422
     error = _assert_envelope(response.json(), "validation_error")

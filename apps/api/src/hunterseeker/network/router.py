@@ -4,8 +4,10 @@ from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
+from hunterseeker.auth.deps import get_current_user
+from hunterseeker.auth.tokens import CurrentUser
 from hunterseeker.core.pagination import CursorQuery, Page
 from hunterseeker.core.schemas import UserSummary
 from hunterseeker.network.schemas import Connection
@@ -25,7 +27,11 @@ _STUB_CONNECTION = Connection(
 
 
 @router.get("/connections", summary="The caller's Connections")
-async def list_connections(params: Annotated[CursorQuery, Query()]) -> Page[Connection]:
-    # TODO(auth): any persona; scoped to the caller. Same endpoint for Seekers and Hunters.
-    del params
+async def list_connections(
+    params: Annotated[CursorQuery, Query()],
+    user: Annotated[CurrentUser, Depends(get_current_user)],
+) -> Page[Connection]:
+    """Any persona; same endpoint for Seekers and Hunters."""
+    # TODO(network): scope to `user`'s own Connections, once persisted.
+    del params, user
     return Page(items=[_STUB_CONNECTION], next_cursor=None)
