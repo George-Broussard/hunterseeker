@@ -34,6 +34,10 @@ export interface paths {
         /**
          * Signup
          * @description Create an account with the chosen persona. 409 if the email is already registered.
+         *
+         *     Rate-limited per IP (``signup_rate_limit_per_ip`` within
+         *     ``signup_rate_limit_window_seconds``) to bound signup spam — every attempt counts,
+         *     not just successful ones.
          */
         post: operations["auth_signup"];
         delete?: never;
@@ -54,6 +58,11 @@ export interface paths {
         /**
          * Verify
          * @description Check an email/password pair. 401 on any failure — the reason is never disclosed.
+         *
+         *     Locked out (429) after ``verify_rate_limit_per_email`` failed attempts for this email,
+         *     or ``verify_rate_limit_per_ip`` failed attempts from this IP, within
+         *     ``verify_rate_limit_window_seconds``. A successful verify never counts against either
+         *     budget, so it never locks out a legitimate, already-correct login.
          */
         post: operations["auth_verify"];
         delete?: never;

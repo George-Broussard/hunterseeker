@@ -146,11 +146,16 @@ Rules (AGENTS.md §8, §10):
 `pydantic-settings` reads environment variables, falling back to `.env` in the current
 directory or at the repo root. See `../../.env.example`.
 
-| Variable       | Default                                                              |
-|----------------|----------------------------------------------------------------------|
-| `DATABASE_URL` | `postgresql+asyncpg://hunterseeker:hunterseeker@localhost:5432/hunterseeker` |
-| `ECHO_SQL`     | `false`                                                              |
-| `AUTH_SECRET`  | *(required)* — shared with `apps/web`; verifies the bearer token     |
+| Variable                            | Default                                                              |
+|--------------------------------------|----------------------------------------------------------------------|
+| `DATABASE_URL`                       | `postgresql+asyncpg://hunterseeker:hunterseeker@localhost:5432/hunterseeker` |
+| `ECHO_SQL`                           | `false`                                                              |
+| `AUTH_SECRET`                        | *(required)* — shared with `apps/web`; verifies the bearer token     |
+| `SIGNUP_RATE_LIMIT_PER_IP`           | `10`                                                                 |
+| `SIGNUP_RATE_LIMIT_WINDOW_SECONDS`   | `3600`                                                               |
+| `VERIFY_RATE_LIMIT_PER_EMAIL`        | `5`                                                                  |
+| `VERIFY_RATE_LIMIT_PER_IP`           | `20`                                                                 |
+| `VERIFY_RATE_LIMIT_WINDOW_SECONDS`   | `900`                                                                |
 
 ## Authentication
 
@@ -160,3 +165,10 @@ short-lived HS256 JWT (`sub`, `role`, `email`; signed with `AUTH_SECRET`) as
 `Authorization: Bearer …` on every API request. Endpoints get the caller via
 `hunterseeker.auth.deps.get_current_user` / `require_role("hunter")` — no database
 round-trip, the token is the authority. Ownership checks still belong in each endpoint.
+
+`POST /auth/signup` and `POST /auth/verify` are rate-limited (`core/ratelimit.py`):
+signup per IP over a window (every attempt counts, spam prevention); verify per email
+*and* per IP, counting only failed attempts (brute-force lockout — a correct password
+never costs you your own budget). Both return `429 too_many_requests` once over. The
+limiter is in-process (`InMemoryRateLimiter`, held on `app.state`) and documents its own
+seam for a Redis-backed implementation once this service runs more than one replica.

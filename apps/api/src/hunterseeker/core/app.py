@@ -11,6 +11,7 @@ from hunterseeker.ats.router import router as ats_router
 from hunterseeker.auth.router import router as auth_router
 from hunterseeker.core.db import get_engine
 from hunterseeker.core.errors import ERROR_RESPONSES, install_error_handlers
+from hunterseeker.core.ratelimit import InMemoryRateLimiter
 from hunterseeker.feed.router import router as feed_router
 from hunterseeker.imports.router import router as imports_router
 from hunterseeker.matching.router import router as matching_router
@@ -46,6 +47,7 @@ def create_app() -> FastAPI:
         responses=ERROR_RESPONSES,
     )
     install_error_handlers(app)
+    app.state.rate_limiter = InMemoryRateLimiter()
 
     @app.get("/health", tags=["ops"])
     async def health() -> dict[str, str]:

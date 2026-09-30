@@ -66,7 +66,7 @@
           "auth"
         ],
         "summary": "Signup",
-        "description": "Create an account with the chosen persona. 409 if the email is already registered.",
+        "description": "Create an account with the chosen persona. 409 if the email is already registered.\n\nRate-limited per IP (``signup_rate_limit_per_ip`` within\n``signup_rate_limit_window_seconds``) to bound signup spam — every attempt counts,\nnot just successful ones.",
         "operationId": "auth_signup",
         "requestBody": {
           "content": {
@@ -128,7 +128,7 @@
           "auth"
         ],
         "summary": "Verify",
-        "description": "Check an email/password pair. 401 on any failure — the reason is never disclosed.",
+        "description": "Check an email/password pair. 401 on any failure — the reason is never disclosed.\n\nLocked out (429) after ``verify_rate_limit_per_email`` failed attempts for this email,\nor ``verify_rate_limit_per_ip`` failed attempts from this IP, within\n``verify_rate_limit_window_seconds``. A successful verify never counts against either\nbudget, so it never locks out a legitimate, already-correct login.",
         "operationId": "auth_verify",
         "requestBody": {
           "content": {
