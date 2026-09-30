@@ -4,8 +4,10 @@ from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
+from hunterseeker.auth.deps import get_current_user
+from hunterseeker.auth.tokens import CurrentUser
 from hunterseeker.core.pagination import CursorQuery, Page
 from hunterseeker.core.schemas import UserSummary
 from hunterseeker.messaging.schemas import Conversation, Message
@@ -35,7 +37,11 @@ _STUB_CONVERSATION = Conversation(
 
 
 @router.get("/conversations", summary="The caller's conversations, most recent first")
-async def list_conversations(params: Annotated[CursorQuery, Query()]) -> Page[Conversation]:
-    # TODO(auth): any persona; scoped to conversations the caller participates in.
-    del params
+async def list_conversations(
+    params: Annotated[CursorQuery, Query()],
+    user: Annotated[CurrentUser, Depends(get_current_user)],
+) -> Page[Conversation]:
+    """Any persona; scoped to conversations the caller participates in."""
+    # TODO(messaging): scope to conversations `user` participates in, once persisted.
+    del params, user
     return Page(items=[_STUB_CONVERSATION], next_cursor=None)

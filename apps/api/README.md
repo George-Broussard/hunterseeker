@@ -22,8 +22,9 @@ apps/api/
 
 Code is organised **by domain**, not by technical layer (AGENTS.md §5). Tests live next
 to the code they test (`<domain>/tests/`). Every domain currently ships stub endpoints
-that return fixed data in the real response shape; each carries a `# TODO(auth): ...`
-marker naming the persona and ownership rule it will enforce.
+that return fixed data in the real response shape; persona authorization is real (see
+below), but ownership scoping is a `# TODO(<domain>): ...` marker until the underlying
+tables exist.
 
 ## Prerequisites
 
@@ -160,3 +161,25 @@ short-lived HS256 JWT (`sub`, `role`, `email`; signed with `AUTH_SECRET`) as
 `Authorization: Bearer …` on every API request. Endpoints get the caller via
 `hunterseeker.auth.deps.get_current_user` / `require_role("hunter")` — no database
 round-trip, the token is the authority. Ownership checks still belong in each endpoint.
+
+No token returns `401 unauthorized`; a token with the wrong persona returns
+`403 forbidden`.
+
+### Persona matrix
+
+| Endpoint                                    | Persona       | Ownership (once persisted)                              |
+|----------------------------------------------|---------------|-----------------------------------------------------------|
+| `GET /profiles/me`                            | seeker        | the caller's own Profile                                   |
+| `PATCH /profiles/me`                          | seeker        | the caller's own Profile                                   |
+| `GET /matching/job-board`                     | seeker        | the caller's own Profile's Matches                          |
+| `GET /matching/matches/{match_id}`            | seeker        | the Match must belong to the caller                         |
+| `GET /matching/jobs/{job_id}/candidates`      | hunter        | the Job must belong to a Company Profile the caller manages |
+| `GET /applications`                           | seeker        | the caller's own Applications                               |
+| `GET /ats/templates`                          | hunter        | templates the caller owns                                   |
+| `GET /messaging/conversations`                | any           | conversations the caller participates in                    |
+| `GET /feed`                                   | seeker        | the caller's Connections + Matches                          |
+| `GET /network/connections`                    | any           | the caller's own Connections                                |
+| `GET /imports/runs`                           | hunter        | Company Profiles the caller manages                          |
+
+A Hunter never reads a Seeker's Profile by ID — only the slice exposed through a Match
+or an Application (AGENTS.md §8).

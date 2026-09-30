@@ -89,7 +89,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The calling Seeker's Profile */
+        /**
+         * The calling Seeker's Profile
+         * @description Returns the caller's own Profile. Hunters never read a Profile by ID — only the
+         *     slice exposed through a Match or an Application (AGENTS.md §8).
+         */
         get: operations["profiles_get_my_profile"];
         put?: never;
         post?: never;
@@ -204,7 +208,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The caller's conversations, most recent first */
+        /**
+         * The caller's conversations, most recent first
+         * @description Any persona; scoped to conversations the caller participates in.
+         */
         get: operations["messaging_list_conversations"];
         put?: never;
         post?: never;
@@ -243,7 +250,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The caller's Connections */
+        /**
+         * The caller's Connections
+         * @description Any persona; same endpoint for Seekers and Hunters.
+         */
         get: operations["network_list_connections"];
         put?: never;
         post?: never;

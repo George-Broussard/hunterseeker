@@ -8,8 +8,10 @@ from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
+from hunterseeker.auth.deps import require_role
+from hunterseeker.auth.tokens import CurrentUser
 from hunterseeker.core.errors import NotFoundError
 from hunterseeker.core.pagination import CursorQuery, Page
 from hunterseeker.core.schemas import UserSummary
@@ -47,16 +49,22 @@ _STUB_CANDIDATE = MatchedCandidate(
 
 
 @router.get("/job-board", summary="The calling Seeker's Job Board")
-async def list_job_board(params: Annotated[CursorQuery, Query()]) -> Page[MatchedJob]:
+async def list_job_board(
+    params: Annotated[CursorQuery, Query()],
+    user: Annotated[CurrentUser, Depends(require_role("seeker"))],
+) -> Page[MatchedJob]:
     """Matches for the calling Seeker at or above their match threshold, best first."""
-    # TODO(auth): seeker-only; scoped to the caller's own Profile.
-    del params  # TODO(matching): cursor over (score desc, id) once Matches are persisted.
+    # TODO(matching): cursor over (score desc, id), scoped to `user`, once Matches are persisted.
+    del params, user
     return Page(items=[_STUB_MATCHED_JOB], next_cursor=None)
 
 
 @router.get("/matches/{match_id}", summary="One Match, Seeker view")
-async def get_match(match_id: UUID) -> MatchedJob:
-    # TODO(auth): seeker-only; the Match must belong to the caller.
+async def get_match(
+    match_id: UUID, user: Annotated[CurrentUser, Depends(require_role("seeker"))]
+) -> MatchedJob:
+    # TODO(matching): the Match must belong to `user`, once Matches are persisted.
+    del user
     if match_id != _STUB_MATCHED_JOB.id:
         raise NotFoundError("Match not found.", {"match_id": str(match_id)})
     return _STUB_MATCHED_JOB
@@ -64,11 +72,13 @@ async def get_match(match_id: UUID) -> MatchedJob:
 
 @router.get("/jobs/{job_id}/candidates", summary="Ranked candidates for a Job")
 async def list_candidates(
-    job_id: UUID, params: Annotated[CursorQuery, Query()]
+    job_id: UUID,
+    params: Annotated[CursorQuery, Query()],
+    user: Annotated[CurrentUser, Depends(require_role("hunter"))],
 ) -> Page[MatchedCandidate]:
     """Every Seeker whose Profile passed this Job's ATS screening, best Match first."""
-    # TODO(auth): hunter-only; the Job must belong to a Company Profile the caller manages.
-    del params
+    # TODO(matching): the Job must belong to a Company Profile `user` manages, once persisted.
+    del params, user
     if job_id != _STUB_JOB.id:
         raise NotFoundError("Job not found.", {"job_id": str(job_id)})
     return Page(items=[_STUB_CANDIDATE], next_cursor=None)

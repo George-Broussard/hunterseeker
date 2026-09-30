@@ -4,8 +4,10 @@ from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
+from hunterseeker.auth.deps import require_role
+from hunterseeker.auth.tokens import CurrentUser
 from hunterseeker.core.pagination import CursorQuery, Page
 from hunterseeker.imports.schemas import ImportRun
 
@@ -25,7 +27,10 @@ _STUB_RUN = ImportRun(
 
 
 @router.get("/runs", summary="Import runs for the calling Hunter's Company Profiles")
-async def list_import_runs(params: Annotated[CursorQuery, Query()]) -> Page[ImportRun]:
-    # TODO(auth): hunter-only; scoped to Company Profiles the caller manages.
-    del params
+async def list_import_runs(
+    params: Annotated[CursorQuery, Query()],
+    user: Annotated[CurrentUser, Depends(require_role("hunter"))],
+) -> Page[ImportRun]:
+    # TODO(imports): scope to Company Profiles `user` manages, once persisted.
+    del params, user
     return Page(items=[_STUB_RUN], next_cursor=None)
