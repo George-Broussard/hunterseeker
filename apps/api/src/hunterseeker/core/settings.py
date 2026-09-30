@@ -40,6 +40,30 @@ class Settings(BaseSettings):
     signature with the same value. Required — there is no safe default.
     """
 
+    signup_rate_limit_per_ip: int = 10
+    """Max ``POST /auth/signup`` requests per IP within ``signup_rate_limit_window_seconds``.
+
+    Counts every attempt, successful or not — this bounds signup spam, not just abuse.
+    """
+
+    signup_rate_limit_window_seconds: float = 3600.0
+    """Window for ``signup_rate_limit_per_ip``, in seconds. One hour by default."""
+
+    verify_rate_limit_per_email: int = 5
+    """Max failed ``POST /auth/verify`` attempts for one email within
+    ``verify_rate_limit_window_seconds`` before that email is locked out.
+
+    Only failures count; a successful verify never contributes to this budget.
+    """
+
+    verify_rate_limit_per_ip: int = 20
+    """Max failed ``POST /auth/verify`` attempts from one IP within
+    ``verify_rate_limit_window_seconds``. Same failure-only counting as the per-email limit.
+    """
+
+    verify_rate_limit_window_seconds: float = 900.0
+    """Window for both ``/auth/verify`` limits, in seconds. 15 minutes by default."""
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
