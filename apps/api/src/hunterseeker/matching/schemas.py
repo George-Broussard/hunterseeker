@@ -60,3 +60,37 @@ class MatchedCandidate(MatchBase):
         default=None,
         description="The Seeker's Profile headline. Readable only through this Match.",
     )
+
+
+class RolePipelineCounts(BaseModel):
+    """How many Seekers sit at each point of a Job's pipeline, as shown on a role card."""
+
+    screened: int = Field(
+        ge=0,
+        description=(
+            "Matches for the Job: every Seeker whose Profile passed its ATS screening. "
+            "This is the whole candidate pool — nobody unscreened is counted anywhere."
+        ),
+    )
+    interviewing: int = Field(
+        ge=0, description="Applications currently in a human interview stage."
+    )
+    offer: int = Field(ge=0, description="Applications with an offer extended.")
+
+
+class OpenRole(BaseModel):
+    """Hunter-side summary of one open Job: its Match activity and pipeline state.
+
+    The Hunter's mirror of the Job Board card. ``top_candidates`` are Matches, so each one
+    has already passed the Job's ATS screening (``ats_pass`` is always ``true``).
+    """
+
+    job: JobSummary
+    new_match_count: int = Field(
+        ge=0, description="Matches created since the calling Hunter last viewed this role."
+    )
+    pipeline: RolePipelineCounts
+    top_candidates: list[MatchedCandidate] = Field(
+        max_length=3,
+        description="Highest-scoring Matches for the Job, best first. At most three.",
+    )
